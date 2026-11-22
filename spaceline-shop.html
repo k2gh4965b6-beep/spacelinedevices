@@ -1,0 +1,771 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Spaceline Tech</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Schibsted+Grotesk:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+/* VOICE everyday retail: a clean, confident electronics store
+   IDEA a showroom counter: devices laid on stone, price tags in brick red
+   PICTURE the hero is a lineup of the six drawn devices on a stone counter; every card shows its device
+   COLOUR stone ground, black ink, white panels, brick accent for prices and buttons
+   TYPE Schibsted Grotesk throughout, heavy for headings
+   LAYOUT nav, hero band with lineup, product grid, checkout drawer, footer; #admin shows the owner's order desk */
+:root{color-scheme:light dark;--bg:light-dark(#ffffff,#121110);--stone:light-dark(#e7e4df,#1d1b19);--ink:light-dark(#141210,#f3f0ec);--soft:light-dark(#5f5a54,#b2aba3);--line:light-dark(#dcd7d0,#34302c);--panel:light-dark(#ffffff,#1a1817);--brick:#c8371e;--brickh:#a82c16;--ok:light-dark(#1f7a44,#5fcf8b)}
+:root[data-theme=light]{color-scheme:light}:root[data-theme=dark]{color-scheme:dark}
+*{box-sizing:border-box;min-width:0}
+html,body{margin:0}
+body{background:var(--bg);color:var(--ink);font:16px/1.55 "Schibsted Grotesk",system-ui,sans-serif;overflow-x:clip}
+h1,h2,h3{line-height:1.05;letter-spacing:-.02em;margin:0;text-wrap:balance;font-weight:800}
+button{font:inherit;cursor:pointer}
+:focus-visible{outline:3px solid var(--brick);outline-offset:2px}
+.wrap{max-width:1240px;margin:0 auto}
+.band{padding:clamp(28px,4vw,64px) max(5vw,16px)}
+nav{position:sticky;top:0;z-index:20;background:var(--bg);border-bottom:1px solid var(--line);padding:10px max(5vw,16px)}
+nav .wrap{display:flex;align-items:center;gap:18px;flex-wrap:wrap}
+.logo{font-weight:800;font-size:21px;color:var(--ink);text-decoration:none;margin-right:auto;display:flex;gap:8px;align-items:center}
+.logo i{width:20px;height:20px;background:var(--brick);border-radius:5px;display:inline-block}
+nav a.l{color:var(--ink);text-decoration:none;font-weight:600;padding:8px 2px}
+.btn{background:var(--brick);color:#fff;border:0;border-radius:12px;padding:10px 18px;min-height:44px;font-weight:700}
+.btn:hover{background:var(--brickh)}
+.btn:disabled{opacity:.45;cursor:default}
+.ghost{background:transparent;color:var(--ink);border:2px solid var(--line);border-radius:12px;padding:8px 16px;min-height:44px;font-weight:700}
+.cartbtn{display:flex;gap:8px;align-items:center}
+.cartbtn b{background:#fff;color:var(--brick);border-radius:999px;min-width:24px;height:24px;display:grid;place-items:center;font-size:13px}
+.hero{background:var(--stone)}
+.hero .top{display:flex;justify-content:space-between;align-items:end;gap:20px;flex-wrap:wrap}
+.hero h1{font-size:clamp(34px,5.5vw,52px);max-width:15ch}
+.hero p{font-size:18px;color:var(--soft);max-width:44ch;margin:12px 0 0}
+.perks{display:flex;gap:8px;flex-wrap:wrap}
+.perks span{background:var(--panel);border:1px solid var(--line);border-radius:999px;padding:8px 14px;font-weight:600;font-size:15px;white-space:nowrap}
+.lineup{display:grid;grid-template-columns:repeat(6,minmax(0,1fr));gap:12px;align-items:end;margin-top:30px;padding-bottom:14px;border-bottom:10px solid light-dark(#cfcac2,#2a2724)}
+.lineup svg{width:100%;height:auto;max-height:190px}
+.tools{display:flex;gap:10px;flex-wrap:wrap;align-items:center;margin-bottom:22px}
+.tools h2{font-size:clamp(28px,4vw,38px);margin-right:auto}
+.chip{border:2px solid var(--line);background:var(--panel);color:var(--ink);border-radius:999px;padding:8px 16px;min-height:44px;font-weight:600}
+.chip[aria-pressed=true]{background:var(--ink);color:var(--bg);border-color:var(--ink)}
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:18px}
+.card{background:var(--panel);border:1px solid var(--line);border-radius:18px;overflow:hidden;display:flex;flex-direction:column}
+.card .pic{background:var(--stone);height:210px;display:grid;place-items:center;padding:18px}
+.card .pic svg{height:170px;width:auto;max-width:100%}
+.card .body{padding:16px 18px 18px;display:flex;flex-direction:column;gap:6px;flex:1}
+.card h3{font-size:21px}
+.card p{margin:0;color:var(--soft);font-size:15px}
+.specs{display:flex;flex-wrap:wrap;gap:6px;margin-top:4px}
+.specs span{font-size:13px;background:var(--stone);border-radius:8px;padding:3px 8px}
+.badge{font-size:13px;font-weight:700;color:var(--brick)}
+.row{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-top:auto;padding-top:10px}
+.price{font-weight:800;font-size:21px;white-space:nowrap}
+.added{background:var(--ink);color:var(--bg)}
+.why{background:var(--ink);color:var(--bg)}
+.why .wrap{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:24px}
+.why h3{font-size:18px;margin-bottom:6px}
+.why p{margin:0;opacity:.8;font-size:15px}
+footer{background:var(--stone)}
+footer .wrap{display:grid;grid-template-columns:minmax(0,1.4fr) repeat(2,minmax(0,1fr));gap:24px}
+footer h3{font-size:17px;margin-bottom:6px}
+footer p{margin:0 0 4px;color:var(--soft)}
+footer small{grid-column:1/-1;color:var(--soft)}
+.scrim{position:fixed;inset:0;background:rgba(10,8,6,.5);opacity:0;pointer-events:none;transition:opacity .2s;z-index:30}
+.drawer{position:fixed;top:0;right:0;height:100%;width:min(440px,100%);background:var(--bg);z-index:31;transform:translateX(100%);transition:transform .25s;display:flex;flex-direction:column}
+.open .scrim{opacity:1;pointer-events:auto}.open .drawer{transform:none}
+.dh{display:flex;justify-content:space-between;align-items:center;padding:16px 20px;border-bottom:1px solid var(--line)}
+.dh h2{font-size:24px}
+.x{border:0;background:none;color:var(--ink);font-size:28px;width:44px;height:44px}
+.dbody{flex:1;overflow:auto;padding:8px 20px 20px}
+.it{display:grid;grid-template-columns:52px minmax(0,1fr) auto;gap:12px;align-items:center;padding:12px 0;border-bottom:1px solid var(--line)}
+.it svg{width:52px;height:52px}
+.it b{display:block}
+.qty{display:flex;align-items:center;gap:4px}
+.qty button{width:36px;height:36px;border-radius:10px;border:2px solid var(--line);background:var(--panel);color:var(--ink);font-weight:700}
+.qty span{min-width:22px;text-align:center;font-variant-numeric:tabular-nums}
+.tot div{display:flex;justify-content:space-between;padding:3px 0}
+.tot .big{font-weight:800;font-size:20px;padding-top:8px}
+.note{font-size:14px;color:var(--soft)}
+label{display:block;font-weight:600;font-size:14px;margin:12px 0 4px}
+input,select,textarea{width:100%;font:inherit;font-size:16px;min-height:44px;border:2px solid var(--line);border-radius:12px;padding:8px 12px;background:var(--panel);color:var(--ink)}
+textarea{min-height:110px;resize:vertical}
+.two{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:10px}
+.full{width:100%;margin-top:16px;min-height:52px;font-size:17px}
+.okbox{background:var(--stone);border-radius:14px;padding:16px;margin:12px 0}
+.okbox code{font-weight:800;font-size:20px}
+.actions{display:flex;gap:8px;flex-wrap:wrap;margin-top:10px}
+.desk{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1.1fr);gap:24px;align-items:start}
+.pane{background:var(--panel);border:1px solid var(--line);border-radius:18px;padding:20px}
+.pane h2{font-size:24px;margin-bottom:4px}
+.statuses{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:8px;margin-top:8px}
+.st{border:2px solid var(--line);background:var(--panel);color:var(--ink);border-radius:12px;padding:10px;min-height:48px;font-weight:700;text-align:left}
+.st[aria-pressed=true]{border-color:var(--brick);background:color-mix(in srgb,var(--brick) 10%,var(--panel))}
+.preview{border:1px solid var(--line);border-radius:14px;overflow:hidden;margin-top:12px;background:#fff;color:#141210}
+.log{list-style:none;padding:0;margin:10px 0 0}
+.log li{border-top:1px solid var(--line);padding:10px 0;display:flex;justify-content:space-between;gap:10px;flex-wrap:wrap}
+.log b{white-space:nowrap}
+.msg{font-weight:600;margin-top:10px}
+.msg.err{color:var(--brick)}.msg.good{color:var(--ok)}
+.stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(9em,1fr));gap:12px;margin-bottom:18px}
+.stat{background:var(--stone);border-radius:14px;padding:14px 16px}
+.stat b{display:block;font-size:clamp(24px,3vw,32px);font-weight:800;font-variant-numeric:tabular-nums;white-space:nowrap}
+.stat span{font-size:14px;color:var(--soft)}
+.abar{display:flex;gap:8px;flex-wrap:wrap;align-items:center;margin-bottom:10px}
+.abar input{flex:1 1 220px;width:auto}.abar select{width:auto;flex:0 1 200px}
+.chk{display:flex;gap:8px;align-items:center;font-weight:500;margin:6px 0}
+.chk input{width:20px;min-height:20px;height:20px}
+.olist{display:flex;flex-direction:column}
+.orow{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:4px 10px;text-align:left;background:none;border:0;border-top:1px solid var(--line);padding:12px 8px;color:var(--ink);border-radius:10px}
+.orow:hover{background:var(--stone)}
+.orow[aria-current=true]{background:color-mix(in srgb,var(--brick) 9%,var(--panel))}
+.orow b{white-space:nowrap}.orow small{color:var(--soft);font-size:13px}
+.pill{display:inline-block;font-size:13px;font-weight:700;border-radius:999px;padding:2px 10px;white-space:nowrap;background:var(--stone);color:var(--ink)}
+.p-new{background:#c8371e;color:#fff}.p-confirmed,.p-processing{background:#f2c94c;color:#141210}.p-shipped,.p-out,.p-pickup{background:#5fa8ff;color:#08203a}.p-delivered{background:#2fb36a;color:#06210f}.p-delayed{background:#ff9a3d;color:#2a1200}.p-cancelled,.p-refunded{background:#9a958e;color:#fff}
+.hist{list-style:none;padding:0;margin:8px 0 0;font-size:14px}
+.hist li{border-left:3px solid var(--line);padding:4px 0 4px 10px}
+.danger{color:var(--brick);border-color:color-mix(in srgb,var(--brick) 40%,var(--line))}
+.empty{padding:30px 8px;color:var(--soft);text-align:center}
+.lockbg{position:fixed;inset:0;background:rgba(10,8,6,.55);z-index:40;display:grid;place-items:center;padding:16px}
+.lockbg[hidden]{display:none}
+.lock{background:var(--bg);border-radius:18px;padding:24px;width:min(360px,100%)}
+.lock h2{font-size:22px;margin-bottom:6px}
+.lock input{font-size:28px;letter-spacing:.4em;text-align:center;font-variant-numeric:tabular-nums}
+.view{display:none}
+body.v-admin #admin,body.v-policies #policies{display:block}
+body.v-admin #store,body.v-policies #store,body.v-order #store{display:none}
+body.v-order #order{display:block}
+.ov{max-width:760px;margin:0 auto}
+.ov h1{font-size:clamp(30px,5vw,44px);margin:6px 0 10px}
+.otrack{display:grid;gap:6px;margin:24px 0 8px}
+.otrack .bar{height:6px;border-radius:3px;background:var(--line)}
+.otrack .on .bar{background:var(--brick)}
+.otrack span{display:block;font-size:13px;margin-top:8px;color:var(--soft)}
+.otrack .on span{color:var(--ink)}.otrack .cur span{font-weight:800}
+.ocard{background:var(--panel);border:1px solid var(--line);border-radius:16px;padding:20px;margin-top:20px}
+.ocard .r{display:flex;justify-content:space-between;gap:12px;padding:8px 0;border-top:1px solid var(--line)}
+.ocard .r:first-of-type{border-top:0}
+.ocard .r b{white-space:nowrap}
+.card.out .pic{opacity:.5}
+.stock{font-size:13px;font-weight:700;color:var(--brick)}
+.trackband{background:var(--stone)}
+.trackband .wrap{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1.2fr);gap:28px;align-items:start}
+.trackband h2{font-size:clamp(28px,4vw,38px)}
+.trackres{background:var(--panel);border:1px solid var(--line);border-radius:16px;padding:16px;margin-top:12px}
+.inline{display:flex;gap:8px;align-items:stretch}
+.inline input{flex:1}
+.tabs{display:flex;gap:4px;flex-wrap:wrap;margin-bottom:18px;border-bottom:2px solid var(--line)}
+.tab{background:none;border:0;border-bottom:3px solid transparent;margin-bottom:-2px;padding:10px 14px;font-weight:700;color:var(--soft);min-height:44px}
+.tab[aria-selected=true]{color:var(--ink);border-color:var(--brick)}
+.tpanel[hidden]{display:none}
+.tbl{width:100%;border-collapse:collapse}
+.tbl th,.tbl td{text-align:left;padding:10px 8px;border-bottom:1px solid var(--line);vertical-align:middle}
+.tbl th{font-size:14px;color:var(--soft);font-weight:600}
+.tbl td.n{text-align:right;white-space:nowrap;font-variant-numeric:tabular-nums}
+.tbl input{max-width:130px}
+.policy{max-width:760px}
+.policy h1{font-size:clamp(32px,5vw,48px);margin-bottom:8px}
+.policy h2{font-size:24px;margin:30px 0 8px}
+.policy p,.policy li{font-size:17px}
+.plinks{display:flex;gap:8px;flex-wrap:wrap;margin:14px 0}
+.plinks a{color:var(--ink);font-weight:700;background:var(--stone);border-radius:999px;padding:8px 14px;text-decoration:none}
+footer a{color:var(--ink)}
+@media(max-width:900px){.desk{grid-template-columns:1fr}.why .wrap{grid-template-columns:repeat(2,minmax(0,1fr))}.trackband .wrap{grid-template-columns:1fr}}
+@media(max-width:700px){.lineup{grid-template-columns:repeat(3,minmax(0,1fr))}.lineup svg{max-height:120px}footer .wrap{grid-template-columns:1fr}nav a.l{display:none}nav a#adminLink:not([hidden]){display:inline}}
+@media(max-width:600px){.grid{grid-template-columns:repeat(auto-fill,minmax(160px,1fr));gap:12px}.card .pic{height:160px}.card .pic svg{height:120px}.card h3{font-size:18px}.card .body{padding:12px}.row{flex-wrap:wrap}.row .btn{width:100%}.specs{display:none}.why .wrap{grid-template-columns:1fr}.two{grid-template-columns:1fr}.tbl input{max-width:90px}}
+@media(prefers-reduced-motion:reduce){*{transition:none!important}}
+</style>
+</head>
+<body>
+<nav><div class="wrap">
+  <a class="logo" href="#"><i></i>Spaceline</a>
+  <a class="l" href="#shop">Shop</a>
+  <a class="l" href="#track">Track order</a>
+  <a class="l" href="#policies">Policies</a>
+  <a class="l" href="#admin" id="adminLink" hidden>Admin</a>
+  <button class="btn cartbtn" id="openCart" aria-label="Open cart">Cart <b id="count">0</b></button>
+</div></nav>
+
+<div id="store">
+<header class="band hero"><div class="wrap">
+  <div class="top">
+    <div>
+      <h1>Phones, audio and more, shipped fast</h1>
+      <p>Every device is new, sealed and covered by a 2-year warranty.</p>
+    </div>
+    <div class="perks"><span>Free shipping over $99</span><span>30-day returns</span><span>Pay on delivery</span></div>
+  </div>
+  <div class="lineup" id="lineup" aria-hidden="true"></div>
+</div></header>
+
+<main class="band" id="shop"><div class="wrap">
+  <div class="tools">
+    <h2>Shop devices</h2>
+    <div id="filters" style="display:flex;gap:8px;flex-wrap:wrap"></div>
+  </div>
+  <div class="grid" id="grid"></div>
+</div></main>
+
+<section class="band why" id="why"><div class="wrap">
+  <div><h3>Sealed and genuine</h3><p>Every device ships new in its original box.</p></div>
+  <div><h3>2-year warranty</h3><p>We repair or replace anything that fails in normal use.</p></div>
+  <div><h3>Updates by email</h3><p>You get an email when your order is confirmed, shipped and delivered.</p></div>
+  <div><h3>30-day returns</h3><p>Changed your mind? Send it back for a full refund.</p></div>
+</div></section>
+
+<section class="band trackband" id="track"><div class="wrap">
+  <div><h2>Track your order</h2><p class="note" style="font-size:16px">Enter the order number from your confirmation email and the email you ordered with.</p></div>
+  <form id="trackForm">
+    <div class="two"><div><label for="tNum">Order number</label><input id="tNum" placeholder="ST-123456" required></div>
+    <div><label for="tEmail">Email</label><input id="tEmail" type="email" required></div></div>
+    <button class="btn full">Check status</button>
+    <div id="trackRes"></div>
+  </form>
+</div></section>
+
+<footer class="band" id="help"><div class="wrap">
+  <div><h3>Spaceline Tech</h3><p>Questions about an order? Email us and include your order number.</p>
+    <p style="margin-top:10px"><a href="#policies-shipping">Shipping</a> · <a href="#policies-returns">Returns</a> · <a href="#policies-warranty">Warranty</a> · <a href="#policies-privacy">Privacy</a></p></div>
+  <div><h3>Contact</h3><p>spacelinetech@agentmail.to</p><p>(984) 204-1195</p></div>
+  <div><h3>Hours</h3><p>Mon to Fri, 9am to 6pm</p><p>Sat, 10am to 2pm</p></div>
+  <small>© 2026 Spaceline Tech. Product names and prices are sample listings.</small>
+</div></footer>
+</div>
+
+<section class="band view" id="order"><div class="ov" id="orderView"></div></section>
+
+<section class="band view" id="policies"><div class="wrap policy">
+  <h1>Store policies</h1>
+  <p class="note">Last updated November 2026.</p>
+  <div class="plinks"><a href="#policies-shipping">Shipping</a><a href="#policies-returns">Returns</a><a href="#policies-warranty">Warranty</a><a href="#policies-payment">Payment</a><a href="#policies-privacy">Privacy</a><a href="#">Back to shop</a></div>
+  <h2 id="policies-shipping">Shipping</h2>
+  <p>We ship orders within 1 business day. Standard delivery takes 3 to 5 business days and costs $7.99, or is free on orders over $99. Express delivery takes 1 to 2 business days and costs $14.99. Store pickup is free; we email you when your order is ready.</p>
+  <p>You get an email when your order ships, with the carrier and tracking number. If a package is lost or arrives damaged, email us within 7 days of the delivery date and we'll replace it.</p>
+  <h2 id="policies-returns">Returns and refunds</h2>
+  <p>You can return any device within 30 days of delivery for a full refund. It must be in like-new condition, with its box and all accessories. Email us with your order number to start a return.</p>
+  <p>We cover return shipping if the item is faulty or we sent the wrong one; otherwise return shipping is paid by you. Refunds are issued within 5 business days of receiving the return and can take 5 to 10 business days to appear.</p>
+  <h2 id="policies-warranty">Warranty</h2>
+  <p>Every device has a 2-year warranty against defects in materials and workmanship. If it fails in normal use, we repair or replace it at no cost. The warranty does not cover accidental damage, liquid damage beyond the device's water rating, or unauthorised repairs.</p>
+  <h2 id="policies-payment">Payment</h2>
+  <p>You pay when your order is delivered or picked up, by card or cash. Discount codes are applied to the price of the items, before shipping and tax. Prices include an estimate of sales tax at checkout; the final amount is confirmed in your order email.</p>
+  <h2 id="policies-privacy">Privacy</h2>
+  <p>We use your name, email, phone number and address only to process, deliver and support your order and to send you order updates. We do not sell or share your details with anyone except the carrier delivering your order. Email us to have your details deleted.</p>
+  <p class="note" style="margin-top:30px">These policies are sample wording. Review them before opening the shop.</p>
+</div></section>
+
+<section class="band view" id="admin"><div class="wrap">
+  <div class="tools"><h2>Admin</h2><a class="ghost" href="#" style="text-decoration:none;display:inline-flex;align-items:center">View shop</a></div>
+  <div class="stats" id="stats"></div>
+  <div class="tabs" role="tablist">
+    <button class="tab" role="tab" data-tab="orders" aria-selected="true">Orders</button>
+    <button class="tab" role="tab" data-tab="stock" aria-selected="false">Stock</button>
+    <button class="tab" role="tab" data-tab="codes" aria-selected="false">Discount codes</button>
+    <button class="tab" role="tab" data-tab="emails" aria-selected="false">Emails</button>
+  </div>
+  <p class="msg" id="aMsg" role="status"></p>
+
+  <div class="tpanel" id="tp-orders">
+    <div class="abar">
+      <input id="aSearch" type="search" placeholder="Search order number, name or email" aria-label="Search orders">
+      <select id="aFilter" aria-label="Filter by status"></select>
+      <button class="btn" id="aNew">New order</button>
+      <button class="ghost" id="aImport">Check inbox</button>
+      <button class="ghost" id="aExport">Copy as spreadsheet</button>
+    </div>
+    <label class="chk"><input type="checkbox" id="aAuto" checked> Send "Order confirmed" automatically for new orders from the inbox</label>
+    <p class="note" style="margin:4px 0 12px">The inbox is also checked every hour automatically. It picks up new orders and answers buyers' status requests.</p>
+    <div class="desk">
+      <div class="pane"><h2 style="font-size:20px">Orders</h2><div class="olist" id="list"></div></div>
+      <div class="pane" id="detail"></div>
+    </div>
+  </div>
+
+  <div class="tpanel pane" id="tp-stock" hidden>
+    <h2>Stock</h2>
+    <p class="note">Stock goes down when an order is added and back up when one is cancelled or refunded. Leave a box empty for unlimited. At 0 the item shows "Sold out".</p>
+    <div class="scroll"><table class="tbl"><thead><tr><th>Product</th><th>Price</th><th>In stock</th><th>Sold</th></tr></thead><tbody id="stockRows"></tbody></table></div>
+    <button class="btn" id="saveStock" style="margin-top:14px">Save stock</button>
+  </div>
+
+  <div class="tpanel pane" id="tp-codes" hidden>
+    <h2>Discount codes</h2>
+    <p class="note">Codes take a percentage off the items. Buyers enter them at checkout.</p>
+    <form id="codeForm" class="two" style="align-items:end">
+      <div><label for="kCode">Code</label><input id="kCode" placeholder="SAVE10" required></div>
+      <div class="inline"><div style="flex:1"><label for="kPct">Percent off</label><input id="kPct" type="number" min="1" max="90" value="10" required></div><button class="btn" style="align-self:end">Add code</button></div>
+    </form>
+    <div class="scroll" style="margin-top:14px"><table class="tbl"><thead><tr><th>Code</th><th>Off</th><th>Used</th><th>Status</th><th></th></tr></thead><tbody id="codeRows"></tbody></table></div>
+  </div>
+
+  <div class="tpanel pane" id="tp-emails" hidden>
+    <h2>Emails</h2>
+    <p class="note">Change what each update email says. Leave a box empty to use the standard wording.</p>
+    <label for="eSign">Sign-off at the end of every email</label>
+    <textarea id="eSign" style="min-height:70px" placeholder="Thanks, the Spaceline Tech team"></textarea>
+    <div id="eRows"></div>
+    <button class="btn" id="saveEmails" style="margin-top:14px">Save emails</button>
+    <h2 style="margin-top:28px">Secret admin code</h2>
+    <p class="note">Tap the Spaceline logo 5 times on the shop and enter this code to unlock Admin. The browser stays unlocked after that.</p>
+    <div class="inline" style="max-width:360px"><input id="newCode" inputmode="numeric" maxlength="6" placeholder="6 digits" autocomplete="off" aria-label="New 6-digit code"><button class="btn" id="saveCode">Set code</button></div>
+    <p class="note" id="codeState"></p>
+    <p class="note" style="margin-top:12px">Emails are sent from spacelinetech@agentmail.to as "Spaceline Tech". Ask Claude to change the sender name.</p>
+  </div>
+  <p class="note" id="storeNote" style="margin-top:14px"></p>
+</div></section>
+
+<div class="lockbg" id="lockBg" hidden><form class="lock" id="lockForm"><h2>Admin</h2><p class="note" id="lockNote" style="margin:0 0 8px">Enter your 6-digit code.</p><input id="lockCode" inputmode="numeric" pattern="[0-9]{6}" maxlength="6" autocomplete="off" aria-label="6-digit code"><p class="msg err" id="lockErr" style="min-height:1.4em"></p><div class="actions"><button class="btn">Unlock</button><button type="button" class="ghost" id="lockCancel">Cancel</button></div></form></div>
+<div class="scrim" id="scrim"></div>
+<aside class="drawer" aria-label="Cart">
+  <div class="dh"><h2 id="dTitle">Your cart</h2><button class="x" id="closeCart" aria-label="Close">×</button></div>
+  <div class="dbody" id="dbody"></div>
+</aside>
+<script>
+{
+const SHOP='Spaceline Tech',INBOX='spacelinetech@agentmail.to';
+const D={
+ phone:`<rect x="38" y="8" width="44" height="104" rx="10" fill="#1d1c1b"/><rect x="42" y="14" width="36" height="92" rx="6" fill="url(#g1)"/><rect x="54" y="17" width="12" height="3" rx="1.5" fill="#1d1c1b"/><path d="M44 30l30-14v4L44 34z" fill="#fff" opacity=".18"/>`,
+ buds:`<rect x="26" y="52" width="68" height="50" rx="22" fill="#f4f2ef" stroke="#cfcac2"/><path d="M26 72h68" stroke="#cfcac2"/><circle cx="60" cy="80" r="3" fill="#2fb36a"/><g fill="#fff" stroke="#cfcac2"><path d="M40 20c-10 0-14 10-10 18s14 8 16 0l2-16z"/><path d="M80 20c10 0 14 10 10 18s-14 8-16 0l-2-16z"/></g>`,
+ tablet:`<rect x="14" y="18" width="92" height="84" rx="9" fill="#2a2826"/><rect x="19" y="23" width="82" height="74" rx="5" fill="url(#g2)"/><path d="M22 40l60-17h10L22 50z" fill="#fff" opacity=".16"/>`,
+ watch:`<rect x="46" y="6" width="28" height="30" rx="6" fill="#c8371e"/><rect x="46" y="84" width="28" height="30" rx="6" fill="#c8371e"/><rect x="36" y="30" width="48" height="60" rx="14" fill="#1d1c1b"/><rect x="41" y="35" width="38" height="50" rx="10" fill="#0e1a24"/><path d="M60 46v14l8 6" stroke="#5fd0ff" stroke-width="3" fill="none" stroke-linecap="round"/><rect x="84" y="50" width="4" height="12" rx="2" fill="#555"/>`,
+ speaker:`<rect x="22" y="30" width="76" height="76" rx="26" fill="#3a5a7a"/><circle cx="60" cy="68" r="24" fill="#2c4660"/><circle cx="60" cy="68" r="10" fill="#1f3346"/><rect x="40" y="18" width="40" height="14" rx="7" fill="none" stroke="#3a5a7a" stroke-width="5"/><g fill="#fff" opacity=".5"><circle cx="40" cy="44" r="2"/><circle cx="80" cy="44" r="2"/></g>`,
+ bank:`<rect x="30" y="14" width="60" height="96" rx="12" fill="#e8e4de" stroke="#cfcac2"/><rect x="52" y="10" width="16" height="6" rx="2" fill="#9a958e"/><g fill="#2fb36a"><rect x="48" y="80" width="24" height="5" rx="2"/><rect x="48" y="70" width="24" height="5" rx="2"/><rect x="48" y="60" width="24" height="5" rx="2" opacity=".35"/></g><path d="M62 30l-8 14h8l-4 12 10-16h-8z" fill="#c8371e"/>`
+};
+const defs=`<defs><linearGradient id="g1" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#ff8a5c"/><stop offset="1" stop-color="#6b3fd4"/></linearGradient><linearGradient id="g2" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#5fd0ff"/><stop offset="1" stop-color="#2f6fb3"/></linearGradient></defs>`;
+const svg=(k,cls='')=>`<svg viewBox="0 0 120 120" class="${cls}" role="img" aria-label="">${defs}${D[k]}</svg>`;
+const P=[
+ {id:'one',name:'Spaceline One',cat:'Phones',art:'phone',price:699,desc:'6.4-inch OLED phone with an all-day battery.',specs:['128 GB','5G','Dual camera'],badge:'Best seller'},
+ {id:'pods',name:'Pod Air',cat:'Audio',art:'buds',price:129,desc:'Wireless earbuds with noise cancelling.',specs:['30 h battery','USB-C','Water resistant']},
+ {id:'slate',name:'Slate 11',cat:'Tablets',art:'tablet',price:449,desc:'11-inch tablet for reading, drawing and streaming.',specs:['256 GB','Wi-Fi 6','Stylus ready']},
+ {id:'pulse',name:'Pulse Watch',cat:'Wearables',art:'watch',price:249,desc:'Heart rate, sleep and GPS on your wrist.',specs:['7-day battery','GPS','Swim proof'],badge:'New'},
+ {id:'boom',name:'Boom Mini',cat:'Audio',art:'speaker',price:79,desc:'Pocket speaker with surprisingly big sound.',specs:['12 h battery','Bluetooth 5.3']},
+ {id:'volt',name:'Volt 20K',cat:'Accessories',art:'bank',price:49,desc:'20,000 mAh power bank, charges two devices.',specs:['65 W','2 × USB-C']}
+];
+const CATS=['All',...new Set(P.map(p=>p.cat))];
+const $=id=>document.getElementById(id);
+const money=n=>'$'+n.toFixed(2);
+const esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const load=(k,d)=>{try{return JSON.parse(localStorage.getItem(k))??d}catch(e){return d}};
+const store=(k,v)=>{try{localStorage.setItem(k,JSON.stringify(v))}catch(e){}};
+let cat='All',cart=load('nl-cart',{}),view='cart',placed=null,shipSel='Standard (3 to 5 days)',codeIn='';
+let cfg={stock:{},sold:{},codes:[],templates:{},signoff:''},cfgLive=false,dbRef=null,isOwner=false;
+const SHIP={'Standard (3 to 5 days)':7.99,'Express (1 to 2 days)':14.99,'Store pickup':0};
+const whenClaude=()=>new Promise(res=>{let n=0;const t=setInterval(()=>{if(window.claude?.use||++n>50){clearInterval(t);res(window.claude?.use?window.claude:null)}},200)});
+const wait=ms=>new Promise(r=>setTimeout(r,ms));
+const left=id=>{const v=cfg.stock?.[id];return v===undefined||v===null||v===''?Infinity:Math.max(0,+v)};
+async function sha(s){try{const b=await crypto.subtle.digest('SHA-256',new TextEncoder().encode(s.trim().toLowerCase()));return [...new Uint8Array(b)].map(x=>x.toString(16).padStart(2,'0')).join('')}catch(e){return ''}}
+
+$('lineup').innerHTML=P.map(p=>svg(p.art)).join('');
+
+/* ---------- shop ---------- */
+function renderFilters(){$('filters').innerHTML=CATS.map(c=>`<button class="chip" data-cat="${c}" aria-pressed="${c===cat}">${c}</button>`).join('')}
+function renderGrid(){
+  $('grid').innerHTML=P.filter(p=>cat==='All'||p.cat===cat).map(p=>{const n=left(p.id),out=n<=0,inCart=cart[p.id]||0;
+   return `<article class="card ${out?'out':''}">
+   <div class="pic">${svg(p.art)}</div>
+   <div class="body">${out?'<span class="stock">Sold out</span>':n<=3?`<span class="stock">Only ${n} left</span>`:p.badge?`<span class="badge">${p.badge}</span>`:''}<h3>${p.name}</h3><p>${p.desc}</p>
+   <div class="specs">${p.specs.map(s=>`<span>${s}</span>`).join('')}</div>
+   <div class="row"><span class="price">${money(p.price)}</span><button class="btn ${inCart?'added':''}" data-add="${p.id}" ${out||inCart>=n?'disabled':''}>${out?'Sold out':inCart?`In cart (${inCart})`:'Add to cart'}</button></div></div></article>`}).join('');
+}
+const lines=()=>Object.keys(cart).filter(k=>cart[k]>0).map(k=>({p:P.find(x=>x.id===k),q:cart[k]})).filter(l=>l.p);
+const findCode=c=>(cfg.codes||[]).find(x=>x.active&&x.code.toUpperCase()===String(c||'').trim().toUpperCase());
+function totals(){
+  const sub=lines().reduce((a,l)=>a+l.p.price*l.q,0),c=findCode(codeIn);
+  const disc=c?Math.round(sub*c.pct)/100:0,after=sub-disc;
+  const ship=sub===0?0:shipSel==='Store pickup'?0:shipSel.startsWith('Standard')&&after>=99?0:SHIP[shipSel];
+  const tax=Math.round(after*0.07*100)/100;return{sub,disc,code:c,ship,tax,total:after+ship+tax};
+}
+function renderCount(){$('count').textContent=lines().reduce((a,l)=>a+l.q,0)}
+function totHtml(t){return `<div class="tot" id="totBox"><div><span>Subtotal</span><span>${money(t.sub)}</span></div>${t.disc?`<div><span>Discount (${esc(t.code.code)}, ${t.code.pct}% off)</span><span>−${money(t.disc)}</span></div>`:''}<div><span>Shipping</span><span>${t.ship?money(t.ship):'Free'}</span></div><div><span>Estimated tax</span><span>${money(t.tax)}</span></div><div class="big"><span>Total</span><span>${money(t.total)}</span></div></div>`}
+function codeNote(){if(!codeIn)return '';const c=findCode(codeIn);return c?`<span style="color:var(--ok);font-weight:700">${esc(c.code)} applied: ${c.pct}% off</span>`:cfgLive?'<span style="color:var(--brick);font-weight:600">That code isn\'t valid.</span>':'We\'ll check this code and apply it when we confirm your order.'}
+function renderDrawer(){
+  const L=lines(),t=totals(),b=$('dbody');
+  if(view==='done'&&placed){
+    $('dTitle').textContent='Order received';const body=orderText(placed);
+    b.innerHTML=`<div class="okbox"><p style="margin:0">Thanks, ${esc(placed.name.split(' ')[0])}! Your order number is</p><code>${placed.num}</code></div>
+    <p><b>One last step:</b> send your order to <b>${INBOX}</b> so we can confirm it. You'll get an email from us as soon as it's confirmed, and again when it ships.</p>
+    <div class="actions"><a class="btn" style="text-decoration:none;display:inline-flex;align-items:center" href="mailto:${INBOX}?subject=${encodeURIComponent('New order '+placed.num)}&body=${encodeURIComponent(body)}">Email my order</a><button class="ghost" id="copyOrder">Copy order</button></div>
+    <p class="note" id="copyMsg">If the email button doesn't open your mail app, copy the order and email it to ${INBOX} with the subject "New order ${placed.num}".</p>
+    <pre style="white-space:pre-wrap;background:var(--stone);padding:12px;border-radius:12px;font-size:14px">${esc(body)}</pre>
+    <button class="ghost full" id="doneBtn">Continue shopping</button>`;return;
+  }
+  if(view==='checkout'&&L.length){
+    $('dTitle').textContent='Checkout';
+    b.innerHTML=`<form id="co"><label for="cName">Full name</label><input id="cName" autocomplete="name" required>
+    <label for="cEmail">Email</label><input id="cEmail" type="email" autocomplete="email" required>
+    <label for="cPhone">Phone</label><input id="cPhone" type="tel" autocomplete="tel">
+    <label for="cShip">Delivery</label><select id="cShip">${Object.keys(SHIP).map(k=>`<option ${k===shipSel?'selected':''}>${k}</option>`).join('')}</select>
+    <div id="addrBox" ${shipSel==='Store pickup'?'hidden':''}><label for="cAddr">Street address</label><input id="cAddr" autocomplete="street-address" ${shipSel==='Store pickup'?'':'required'}>
+    <div class="two"><div><label for="cCity">City</label><input id="cCity" autocomplete="address-level2" ${shipSel==='Store pickup'?'':'required'}></div><div><label for="cZip">ZIP code</label><input id="cZip" autocomplete="postal-code" ${shipSel==='Store pickup'?'':'required'}></div></div></div>
+    <label for="cCode">Discount code</label><div class="inline"><input id="cCode" value="${esc(codeIn)}" autocomplete="off"><button type="button" class="ghost" id="applyCode">Apply</button></div>
+    <p class="note" id="codeMsg" style="margin:6px 0 0">${codeNote()}</p>
+    <p class="note" style="margin-top:14px">Payment: pay on delivery or at pickup, by card or cash. By placing your order you agree to our <a href="#policies" style="color:inherit">store policies</a>.</p>
+    ${totHtml(t)}
+    <button class="btn full">Place order</button><button type="button" class="ghost full" id="backCart">Back to cart</button></form>`;return;
+  }
+  view='cart';$('dTitle').textContent='Your cart';
+  b.innerHTML=L.length?L.map(l=>`<div class="it">${svg(l.p.art)}<div><b>${l.p.name}</b><span class="note">${money(l.p.price)}</span></div>
+   <div class="qty"><button data-q="${l.p.id}" data-d="-1" aria-label="Remove one ${l.p.name}">−</button><span>${l.q}</span><button data-q="${l.p.id}" data-d="1" aria-label="Add one ${l.p.name}" ${l.q>=left(l.p.id)?'disabled':''}>+</button></div></div>`).join('')+
+   totHtml(t)+(t.sub-t.disc<99&&shipSel.startsWith('Standard')?`<p class="note">Add ${money(99-(t.sub-t.disc))} more for free standard shipping.</p>`:'')+`<button class="btn full" id="toCheckout">Checkout</button>`
+   :`<p class="note" style="padding:30px 0;text-align:center">Your cart is empty.</p>`;
+}
+function orderText(o){return `Order: ${o.num}\nName: ${o.name}\nEmail: ${o.email}\nPhone: ${o.phone||'-'}\nAddress: ${o.addr||'-'}\nDelivery: ${o.ship}\nItems: ${o.items}\nDiscount code: ${o.code||'-'}\nTotal: ${o.total}\nPayment: Pay on delivery`}
+const openD=v=>document.body.classList.toggle('open',v);
+function all(){renderFilters();renderGrid();renderCount();renderDrawer()}
+
+document.addEventListener('click',e=>{
+  const t=e.target.closest('button');if(!t)return;
+  if(t.dataset.cat){cat=t.dataset.cat;renderFilters();renderGrid()}
+  else if(t.dataset.add){const id=t.dataset.add;if((cart[id]||0)>=left(id))return;cart[id]=(cart[id]||0)+1;store('nl-cart',cart);if(view==='done')view='cart';renderGrid();renderCount();renderDrawer()}
+  else if(t.dataset.q){const k=t.dataset.q;cart[k]=Math.max(0,Math.min(left(k),(cart[k]||0)+ +t.dataset.d));if(!cart[k])delete cart[k];store('nl-cart',cart);renderGrid();renderCount();renderDrawer()}
+  else if(t.id==='openCart'){openD(true)}
+  else if(t.id==='closeCart'){openD(false)}
+  else if(t.id==='toCheckout'){view='checkout';renderDrawer()}
+  else if(t.id==='backCart'){view='cart';renderDrawer()}
+  else if(t.id==='applyCode'){codeIn=$('cCode').value.trim();$('codeMsg').innerHTML=codeNote();$('totBox').outerHTML=totHtml(totals())}
+  else if(t.id==='doneBtn'){view='cart';placed=null;renderDrawer();openD(false)}
+  else if(t.id==='copyOrder'){navigator.clipboard?.writeText(orderText(placed)).then(()=>{$('copyMsg').textContent='Copied. Paste it into an email to '+INBOX+'.'},()=>{$('copyMsg').textContent='Select the order below and copy it.'})}
+});
+document.addEventListener('change',e=>{if(e.target.id==='cShip'){shipSel=e.target.value;const p=shipSel==='Store pickup';$('addrBox').hidden=p;['cAddr','cCity','cZip'].forEach(i=>$(i).required=!p);$('totBox').outerHTML=totHtml(totals())}});
+document.addEventListener('submit',e=>{
+  if(e.target.id!=='co')return;e.preventDefault();
+  codeIn=$('cCode').value.trim();
+  const v=id=>$(id).value.trim(),t=totals(),pick=shipSel==='Store pickup';
+  placed={num:'ST-'+Math.floor(100000+Math.random()*900000),name:v('cName'),email:v('cEmail'),phone:v('cPhone'),addr:pick?'Store pickup':`${v('cAddr')}, ${v('cCity')} ${v('cZip')}`,ship:shipSel,items:lines().map(l=>`${l.q} × ${l.p.name}`).join(', '),code:codeIn?codeIn.toUpperCase():'',total:money(t.total)};
+  cart={};codeIn='';store('nl-cart',cart);view='done';renderGrid();renderCount();renderDrawer();
+});
+$('scrim').addEventListener('click',()=>openD(false));
+document.addEventListener('keydown',e=>{if(e.key==='Escape')openD(false)});
+
+/* track order */
+$('trackForm').addEventListener('submit',async e=>{
+  e.preventDefault();const n=$('tNum').value.trim().toUpperCase(),em=$('tEmail').value.trim(),R=$('trackRes');
+  R.innerHTML='<div class="trackres note">Checking…</div>';
+  let doc=null;
+  if(dbRef){try{const s=await dbRef.doc('status/'+n).get();if(s.exists)doc=s.data()}catch(err){}}
+  if(doc&&doc.eh&&doc.eh===await sha(em)){
+    R.innerHTML=`<div class="trackres"><span class="pill p-${esc(doc.status)}">${esc(doc.label)}</span><h3 style="font-size:22px;margin:10px 0 6px">Order ${esc(n)}</h3><p style="margin:0">${esc(doc.msg||'')}</p>${doc.carrier||doc.track?`<p style="margin:8px 0 0"><b>${esc(doc.carrier||'Tracking')}</b> ${esc(doc.track||'')}</p>`:''}<p class="note" style="margin:8px 0 0">Updated ${new Date(doc.updated).toLocaleString()}</p></div>`;
+  }else{
+    const body=`Order: ${n}\nEmail: ${em}`;
+    R.innerHTML=`<div class="trackres"><p style="margin:0 0 8px">We'll email the latest status for <b>${esc(n)}</b> to <b>${esc(em)}</b>. Send us this request to get it:</p>
+    <a class="btn" style="text-decoration:none;display:inline-flex;align-items:center" href="mailto:${INBOX}?subject=${encodeURIComponent('Status request '+n)}&body=${encodeURIComponent(body)}">Email me my status</a>
+    <p class="note" style="margin:8px 0 0">Or email ${INBOX} with the subject "Status request ${esc(n)}". We reply within the hour.</p></div>`;
+  }
+});
+
+/* ---------- Admin ---------- */
+const ST=[
+ {k:'new',l:'New',s:'',m:''},
+ {k:'confirmed',l:'Order confirmed',s:'Your order {num} is confirmed',m:'Thanks for shopping with us. We\'ve received your order and are getting it ready.'},
+ {k:'processing',l:'Processing',s:'We\'re preparing order {num}',m:'Your items are being picked and packed at our warehouse.'},
+ {k:'shipped',l:'Shipped',s:'Your order {num} has shipped',m:'Good news: your order is on its way.'},
+ {k:'out',l:'Out for delivery',s:'Order {num} is out for delivery',m:'Your package is on the delivery vehicle and should arrive today. Please have your payment ready.'},
+ {k:'delivered',l:'Delivered',s:'Order {num} was delivered',m:'Your order has been delivered. We hope you love it. Reply to this email if anything is wrong.'},
+ {k:'pickup',l:'Ready for pickup',s:'Order {num} is ready for pickup',m:'Your order is ready at our store. Bring your order number when you collect it.'},
+ {k:'delayed',l:'Delayed',s:'Update on order {num}',m:'Your order is running a little late. We\'re sorry for the wait and will update you as soon as it moves.'},
+ {k:'cancelled',l:'Cancelled',s:'Order {num} has been cancelled',m:'Your order has been cancelled. You have not been charged.'},
+ {k:'refunded',l:'Refunded',s:'Your refund for order {num}',m:'We\'ve issued your refund. It can take 5 to 10 business days to appear.'}
+];
+const SL=k=>ST.find(x=>x.k===k)||ST[0];
+const MSG=k=>(cfg.templates&&cfg.templates[k])||SL(k).m;
+const CLOSED=['delivered','cancelled','refunded'],VOID=['cancelled','refunded'];
+let orders=[],sel=null,draft=null,pick='confirmed',q='',fs='all',useLocal=false,busy=false,sending=false,delArm=false,tab='orders';
+const amsg=(m,c)=>{const el=$('aMsg');el.textContent=m;el.className='msg '+(c||'')};
+const num2=s=>{const n=parseFloat(String(s||'').replace(/[^0-9.]/g,''));return isNaN(n)?0:n};
+const when=t=>{try{return new Date(t).toLocaleString([], {month:'short',day:'numeric',hour:'numeric',minute:'2-digit'})}catch(e){return ''}};
+function newNum(){let n;do{n='ST-'+Math.floor(100000+Math.random()*900000)}while(orders.some(o=>o.num===n));return n}
+const blank=()=>({num:newNum(),name:'',email:'',phone:'',addr:'',ship:'Standard (3 to 5 days)',items:'',code:'',total:'',status:'new',carrier:'',track:'',notes:'',created:Date.now(),history:[]});
+function parseItems(s){const out={};String(s||'').replace(/(\d+)\s*[×x]\s*([^,]+)/gi,(m,n,name)=>{const p=P.find(x=>x.name.toLowerCase()===name.trim().toLowerCase());if(p)out[p.id]=(out[p.id]||0)+ +n;return m});return out}
+
+async function getMcp(){const c=await whenClaude();return c?await c.use('mcp'):null}
+async function call(tool,input,ms=30000){
+  const mcp=await getMcp();if(!mcp)throw{code:'unavailable_here'};
+  const go=()=>Promise.race([mcp.callTool('AgentMail',tool,input),wait(ms).then(()=>{throw{code:'slow'}})]);
+  try{return await go()}catch(err){
+    if(err&&err.retryable&&err.code==='upstream_error'){await wait(Math.min(err.retryAfterMs||1500,5000));return await go()}
+    throw err}
+}
+async function saveCfg(){
+  if(dbRef&&!useLocal){try{await dbRef.doc('shop/config').set(JSON.parse(JSON.stringify(cfg)));return true}catch(e){}}
+  store('st-cfg',cfg);renderGrid();return false;
+}
+/* stock: take when an order is live, give back when it is cancelled/refunded */
+function adjustStock(o){
+  const want=!VOID.includes(o.status),items=parseItems(o.items);
+  if(want&&!o.stockTaken){for(const id in items){if(cfg.stock[id]!==undefined&&cfg.stock[id]!==null&&cfg.stock[id]!=='')cfg.stock[id]=Math.max(0,+cfg.stock[id]-items[id]);cfg.sold[id]=(cfg.sold[id]||0)+items[id]}o.stockTaken=true;return true}
+  if(!want&&o.stockTaken){for(const id in items){if(cfg.stock[id]!==undefined&&cfg.stock[id]!==null&&cfg.stock[id]!=='')cfg.stock[id]=+cfg.stock[id]+items[id];cfg.sold[id]=Math.max(0,(cfg.sold[id]||0)-items[id])}o.stockTaken=false;return true}
+  return false;
+}
+function codeUse(o){if(o.code&&!o.codeCounted&&!VOID.includes(o.status)){const c=(cfg.codes||[]).find(x=>x.code===o.code.toUpperCase());if(c){c.used=(c.used||0)+1;o.codeCounted=true;return true}}return false}
+async function saveOrder(o){
+  o.updated=Date.now();
+  const cfgChanged=adjustStock(o)|codeUse(o);
+  if(cfgChanged)await saveCfg();
+  const S=SL(o.status);
+  const pub={status:o.status,label:S.l,msg:o.status==='new'?'We\'ve received your order and will confirm it shortly.':MSG(o.status),carrier:o.carrier||'',track:o.track||'',updated:o.updated,eh:await sha(o.email||'')};
+  if(dbRef&&!useLocal){try{await dbRef.doc('orders/'+o.num).set(JSON.parse(JSON.stringify(o)));try{await dbRef.doc('status/'+o.num).set(pub)}catch(e){}return}catch(e){useLocal=true;storeNoteSet()}}
+  const i=orders.findIndex(x=>x.num===o.num);if(i<0)orders.push(o);else orders[i]=o;store('st-orders',orders);renderAdmin();
+}
+async function removeOrder(numv){
+  const o=orders.find(x=>x.num===numv);if(o&&o.stockTaken){o.status='cancelled';adjustStock(o);await saveCfg()}
+  if(dbRef&&!useLocal){try{await dbRef.doc('orders/'+numv).delete();try{await dbRef.doc('status/'+numv).delete()}catch(e){}return}catch(e){}}
+  orders=orders.filter(x=>x.num!==numv);store('st-orders',orders);renderAdmin();
+}
+function storeNoteSet(){$('storeNote').textContent=dbRef&&!useLocal?'Everything here is saved to your shop and shows up on any device where you open Admin.':'Saved in this browser only.'}
+
+const BASE='https://k2gh4965b6-beep.github.io/Spacelinetech/';
+const toHex=t=>[...new TextEncoder().encode(t)].map(b=>b.toString(16).padStart(2,'0')).join('');
+const fromHex=h=>new TextDecoder().decode(new Uint8Array((h.match(/[0-9a-f]{2}/g)||[]).map(x=>parseInt(x,16))));
+function trackLink(o,k){return BASE+'#o-'+toHex(JSON.stringify({n:o.num,s:k,f:(o.name||'').split(' ')[0],i:o.items||'',t:o.total||'',d:o.ship||'',c:o.carrier||'',k:o.track||'',u:Date.now()}))}
+function stepsFor(k,pick){const steps=pick?['Ordered','Confirmed','Ready for pickup','Picked up']:['Ordered','Confirmed','Shipped','Out for delivery','Delivered'];return{steps,idx:{new:0,confirmed:1,processing:1,shipped:2,out:3,pickup:2,delivered:pick?3:4}[k]}}
+function renderOrderView(){
+  const V=$('orderView');let d=null;
+  try{const h=location.hash.slice(3);if(/^[0-9a-f]+$/.test(h)&&h.length<6000)d=JSON.parse(fromHex(h))}catch(e){d=null}
+  if(!d||!d.n){V.innerHTML='<h1>We couldn\'t open that tracking link</h1><p>Check the link in your email, or look up your order below.</p><a class="btn" href="#track" style="text-decoration:none;display:inline-flex;align-items:center">Look up an order</a>';return}
+  const S=SL(d.s),pick=d.d==='Store pickup'||d.s==='pickup',T=stepsFor(d.s,pick),items=itemList(d.i);
+  const note={delayed:'Your order is running late. We\'ll email you as soon as it moves.',cancelled:'This order was cancelled. You have not been charged.',refunded:'Your refund has been issued. It can take 5 to 10 business days to appear.'}[d.s];
+  V.innerHTML=`<p class="note" style="margin:0">Order ${esc(d.n)}</p><h1>${esc(d.f?d.f+', y':'Y')}our order ${({new:'has been received',confirmed:'is confirmed',processing:'is being prepared',shipped:'has shipped',out:'is out for delivery',delivered:'was delivered',pickup:'is ready for pickup',delayed:'is delayed',cancelled:'was cancelled',refunded:'was refunded'})[d.s]||'is '+esc(S.l.toLowerCase())}</h1>
+  <p style="font-size:17px;margin:0">${esc(MSG(d.s))}</p>
+  ${T.idx===undefined?`<div class="ocard" style="font-weight:700">${esc(note||S.l)}</div>`:`<div class="otrack" style="grid-template-columns:repeat(${T.steps.length},minmax(0,1fr))">${T.steps.map((x,i)=>`<div class="${i<=T.idx?'on':''} ${i===T.idx?'cur':''}"><div class="bar"></div><span>${x}</span></div>`).join('')}</div>`}
+  <div class="ocard"><h2 style="font-size:20px;margin-bottom:6px">Order summary</h2>
+   ${items.map(i=>`<div class="r"><span>${i.q} × ${esc(i.name)}</span><b>${i.price!==null?money(i.price):''}</b></div>`).join('')}
+   ${d.t?`<div class="r"><span><b>Total</b></span><b>${esc(d.t)}</b></div>`:''}</div>
+  <div class="ocard"><h2 style="font-size:20px;margin-bottom:6px">Delivery</h2>
+   <div class="r"><span>Method</span><b>${esc(d.d||'-')}</b></div>
+   ${d.c?`<div class="r"><span>Carrier</span><b>${esc(d.c)}</b></div>`:''}${d.k?`<div class="r"><span>Tracking number</span><b style="white-space:normal;text-align:right">${esc(d.k)}</b></div>`:''}</div>
+  <p class="note" style="margin-top:16px">Status as of ${new Date(d.u).toLocaleString([], {dateStyle:'medium',timeStyle:'short'})}. Each update email has a fresh link.</p>
+  <div class="actions"><a class="btn" href="#track" style="text-decoration:none;display:inline-flex;align-items:center">Check for newer updates</a><a class="ghost" href="#" style="text-decoration:none;display:inline-flex;align-items:center">Continue shopping</a></div>
+  <p class="note" style="margin-top:20px">Questions? Email ${INBOX} with your order number.</p>`;
+  const n=$('tNum');if(n)n.value=d.n;
+}
+function itemList(s){
+  return String(s||'').split(',').map(x=>x.trim()).filter(Boolean).map(x=>{const m=x.match(/^(\d+)\s*[×x]\s*(.+)$/i);const q=m?+m[1]:1,name=(m?m[2]:x).trim();const p=P.find(y=>y.name.toLowerCase()===name.toLowerCase());return{q,name:p?p.name:name,price:p?p.price*q:null}});
+}
+function emailFor(o,k){
+  const S=SL(k),first=(o.name||'there').split(' ')[0],subject=S.s.replace('{num}',o.num),body=MSG(k),sign=cfg.signoff||'The Spaceline Tech team';
+  const pick=o.ship==='Store pickup'||k==='pickup';
+  const steps=pick?['Ordered','Confirmed','Ready for pickup','Picked up']:['Ordered','Confirmed','Shipped','Out for delivery','Delivered'];
+  const idx={new:0,confirmed:1,processing:1,shipped:2,out:3,pickup:2,delivered:pick?3:4}[k];
+  const notice={delayed:['#fff4e5','#8a4b00','Your order is delayed'],cancelled:['#f2f2f2','#444','This order was cancelled'],refunded:['#eaf6ee','#1f6b3a','Refund issued']}[k];
+  const items=itemList(o.items),known=items.every(i=>i.price!==null)&&items.length,sub=known?items.reduce((a,i)=>a+i.price,0):0;
+  const F='font-family:-apple-system,BlinkMacSystemFont,\'Segoe UI\',Helvetica,Arial,sans-serif;';
+  const td=(c,st='')=>`<td style="${F}${st}">${c}</td>`;
+  const tracker=idx===undefined?'':`<table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="margin:8px 0 28px"><tr>${steps.map((s,i)=>`<td align="center" valign="top" width="${Math.floor(100/steps.length)}%" style="${F}padding:0 2px"><table role="presentation" width="100%" cellpadding="0" cellspacing="0"><tr><td style="height:4px;background:${i<=idx?'#c8371e':'#e5e5e5'};font-size:0;line-height:0">&nbsp;</td></tr></table><div style="${F}font-size:12px;line-height:16px;margin-top:8px;color:${i<=idx?'#111111':'#8a8a8a'};font-weight:${i===idx?'700':'400'}">${s}</div></td>`).join('')}</tr></table>`;
+  const banner=notice?`<table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="margin:0 0 24px"><tr><td style="${F}background:${notice[0]};color:${notice[1]};padding:14px 16px;border-radius:6px;font-size:15px;font-weight:600">${notice[2]}</td></tr></table>`:'';
+  const itemRows=items.map(i=>`<tr>${td(`<b style="color:#111">${esc(i.name)}</b><br><span style="color:#6b6b6b;font-size:14px">Qty ${i.q}</span>`,'padding:14px 0;border-bottom:1px solid #ececec;font-size:15px;line-height:21px')}${td(i.price!==null?money(i.price):'','padding:14px 0;border-bottom:1px solid #ececec;font-size:15px;text-align:right;white-space:nowrap;color:#111;vertical-align:top')}</tr>`).join('');
+  const sumRow=(l,v,b)=>`<tr>${td(l,`padding:5px 0;font-size:${b?16:14}px;color:${b?'#111':'#6b6b6b'};font-weight:${b?700:400}`)}${td(v,`padding:5px 0;font-size:${b?16:14}px;text-align:right;color:#111;font-weight:${b?700:400};white-space:nowrap`)}</tr>`;
+  const summary=(items.length||o.total)?`<h2 style="${F}font-size:17px;margin:0 0 4px;color:#111">Order summary</h2><table role="presentation" width="100%" cellpadding="0" cellspacing="0">${itemRows}</table><table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="margin-top:10px">${known?sumRow('Items',money(sub)):''}${o.code?sumRow('Discount code',esc(o.code)):''}${o.total?sumRow('Total',esc(o.total),true):''}${sumRow('Payment','Pay on '+(pick?'pickup':'delivery'))}</table>`:'';
+  const ship=[o.carrier&&['Carrier',o.carrier],o.track&&['Tracking number',o.track]].filter(Boolean);
+  const addrBlock=`<table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="margin-top:28px"><tr><td valign="top" width="50%" style="${F}padding-right:12px;font-size:14px;line-height:21px;color:#111"><div style="color:#6b6b6b;font-size:13px;margin-bottom:4px">${pick?'Pickup':'Shipping to'}</div>${esc(o.name)}<br>${pick?'Spaceline Tech store':esc(o.addr||'')}</td><td valign="top" width="50%" style="${F}font-size:14px;line-height:21px;color:#111"><div style="color:#6b6b6b;font-size:13px;margin-bottom:4px">Delivery</div>${esc(o.ship||'')}${ship.map(r=>`<br><span style="color:#6b6b6b">${r[0]}:</span> ${esc(r[1])}`).join('')}</td></tr></table>`;
+  const track=trackLink(o,k);
+  const html=`<!DOCTYPE html><html><head><meta charset="utf-8"><meta name="viewport" content="width=device-width"><meta name="color-scheme" content="light"><meta name="supported-color-schemes" content="light"><title>${esc(subject)}</title></head>
+<body style="margin:0;padding:0;background:#f4f4f2" bgcolor="#f4f4f2">
+<div style="display:none;max-height:0;overflow:hidden;opacity:0">${esc(body)}</div>
+<table role="presentation" width="100%" cellpadding="0" cellspacing="0" bgcolor="#f4f4f2" style="background:#f4f4f2"><tr><td align="center" style="padding:24px 12px">
+<table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="max-width:600px">
+<tr><td style="${F}padding:4px 4px 18px"><table role="presentation" cellpadding="0" cellspacing="0"><tr><td style="width:18px;height:18px;background:#c8371e;border-radius:4px;font-size:0">&nbsp;</td><td style="${F}padding-left:9px;font-size:19px;font-weight:800;letter-spacing:-0.3px;color:#111">Spaceline Tech</td></tr></table></td></tr>
+<tr><td bgcolor="#ffffff" style="background:#ffffff;border-radius:10px;padding:36px 32px">
+<div style="${F}font-size:13px;color:#6b6b6b;margin-bottom:6px">Order ${esc(o.num)}</div>
+<h1 style="${F}font-size:26px;line-height:32px;margin:0 0 16px;color:#111;font-weight:700">${S.l==='Order confirmed'?esc('Thanks for your order, '+first+'!'):esc(subject).replace(esc(o.num),'<span style="white-space:nowrap">'+esc(o.num)+'</span>')}</h1>
+<p style="${F}font-size:16px;line-height:24px;color:#333;margin:0 0 24px">Hi ${esc(first)}, ${esc(body.charAt(0).toLowerCase()+body.slice(1))}</p>
+${banner}${tracker}
+<table role="presentation" cellpadding="0" cellspacing="0" style="margin:0 0 32px"><tr><td bgcolor="#111111" style="border-radius:6px"><a href="${track}" style="${F}display:inline-block;padding:13px 26px;font-size:15px;font-weight:700;color:#ffffff;text-decoration:none;border-radius:6px">Track your order</a></td></tr></table>
+${o.msg?`<p style="${F}font-size:16px;line-height:24px;color:#333;margin:0 0 28px;padding:14px 16px;background:#f7f7f5;border-radius:6px">${esc(o.msg)}</p>`:''}
+${summary}${addrBlock}
+<p style="${F}font-size:15px;line-height:23px;color:#333;margin:32px 0 0;white-space:pre-line">${esc(sign)}</p>
+</td></tr>
+<tr><td style="${F}padding:22px 8px;font-size:12px;line-height:19px;color:#7a7a7a;text-align:center">Questions? Reply to this email or contact us at ${INBOX} · (984) 204-1195<br>Returns accepted within 30 days · 2-year warranty on every device<br><br>You're receiving this email because you placed an order with Spaceline Tech.<br>© 2026 Spaceline Tech</td></tr>
+</table></td></tr></table></body></html>`;
+  const lines=[`Order ${o.num}`,'',`Hi ${first},`,'',body,'',...(o.msg?[o.msg,'']:[]),'Order summary',...items.map(i=>`${i.q} × ${i.name}${i.price!==null?'  '+money(i.price):''}`),...(o.code?['Discount code: '+o.code]:[]),...(o.total?['Total: '+o.total]:[]),'',`${pick?'Pickup':'Shipping to'}: ${o.name}${pick?'':', '+(o.addr||'')}`,`Delivery: ${o.ship||''}`,...ship.map(r=>r[0]+': '+r[1]),'','Questions? Reply to this email.','',sign,'','Spaceline Tech · '+INBOX];
+  return{subject,text:lines.join('\n'),html};
+}
+const errText=err=>{const code=err&&err.code,M={
+  unavailable_here:'Email only works when you open Admin on claude.ai.',
+  slow:'AgentMail hasn\'t answered yet. If claude.ai shows a prompt, choose Allow. Check the inbox\'s Sent folder before sending again.',
+  server_not_connected:'AgentMail isn\'t connected. Add it in claude.ai Settings → Connectors.',
+  needs_reauth:'Reconnect AgentMail in claude.ai Settings → Connectors.',
+  not_in_manifest:'AgentMail is turned off for this page. Allow it and try again.',
+  approval_required:'Approve AgentMail for this page: press the button again and choose Allow.',
+  tool_error:'AgentMail refused: '+(err&&err.message||'unknown reason')};
+  return (M[code]||'Something went wrong. Check the inbox before trying again.')+(code?` (${code})`:'')};
+async function sendStatus(o,k){
+  const E=emailFor(o,k);
+  await call('send_message',{inboxId:INBOX,to:[o.email],subject:E.subject,text:E.text,html:E.html});
+  o.status=k;o.history=[...(o.history||[]),{at:Date.now(),status:k,emailed:true}];
+}
+
+function renderStats(){
+  const live=orders.filter(o=>!VOID.includes(o.status));
+  const low=P.filter(p=>left(p.id)<=3).length;
+  const S=[[orders.length,'Orders'],[orders.filter(o=>o.status==='new').length,'Need confirming'],[orders.filter(o=>!CLOSED.includes(o.status)&&o.status!=='new').length,'In progress'],[money(live.reduce((a,o)=>a+num2(o.total),0)),'Sales'],[low,'Low or sold out']];
+  $('stats').innerHTML=S.map(s=>`<div class="stat"><b>${s[0]}</b><span>${s[1]}</span></div>`).join('');
+}
+function renderList(){
+  const L=orders.filter(o=>(fs==='all'||(fs==='open'?!CLOSED.includes(o.status):o.status===fs))&&(!q||[o.num,o.name,o.email].join(' ').toLowerCase().includes(q))).sort((a,b)=>(b.created||0)-(a.created||0));
+  $('list').innerHTML=L.length?L.map(o=>`<button class="orow" data-o="${esc(o.num)}" aria-current="${sel===o.num}"><b>${esc(o.num)}</b><span class="pill p-${esc(o.status)}">${esc(SL(o.status).l)}</span><small>${esc(o.name||'No name')} · ${when(o.created)}</small><small style="text-align:right">${esc(o.total||'')}</small></button>`).join(''):`<div class="empty">${orders.length?'No orders match.':'No orders yet. Press "Check inbox" or "New order".'}</div>`;
+}
+const F=[['num','Order number'],['name','Customer name'],['email','Customer email','email'],['phone','Phone','tel'],['addr','Address'],['ship','Delivery'],['items','Items'],['code','Discount code'],['total','Total'],['carrier','Carrier'],['track','Tracking number']];
+function renderDetail(){
+  const d=draft;
+  if(!d){$('detail').innerHTML='<div class="empty">Pick an order to manage it.</div>';return}
+  const isNew=!orders.some(o=>o.num===sel);
+  const E=emailFor({...d,msg:$('dMsg')?.value||''},pick);
+  $('detail').innerHTML=`<div style="display:flex;justify-content:space-between;gap:10px;flex-wrap:wrap;align-items:center"><h2>${isNew?'New order':esc(d.num)}</h2><span class="pill p-${esc(d.status)}">${esc(SL(d.status).l)}</span></div>
+  <form id="dForm"><div class="two">${F.map(f=>`<div><label for="f-${f[0]}">${f[1]}</label><input id="f-${f[0]}" data-f="${f[0]}" type="${f[2]||'text'}" value="${esc(d[f[0]])}" ${f[0]==='num'&&!isNew?'readonly':''}></div>`).join('')}</div>
+  <p class="note" style="margin:6px 0 0">Write items as "1 × Spaceline One, 2 × Pod Air" so stock updates.</p>
+  <label for="f-notes">Private notes</label><textarea id="f-notes" data-f="notes" style="min-height:70px">${esc(d.notes)}</textarea>
+  <div class="actions"><button class="btn" id="dSave">${isNew?'Create order':'Save changes'}</button>${isNew?'':`<button type="button" class="ghost" id="dCopy">Copy details</button><button type="button" class="ghost danger" id="dDel">${delArm?'Tap again to delete':'Delete'}</button>`}</div></form>
+  <h3 style="font-size:18px;margin-top:22px">Send an update to the customer</h3>
+  <div class="statuses">${ST.slice(1).map(s=>`<button type="button" class="st" data-pick="${s.k}" aria-pressed="${s.k===pick}">${s.l}</button>`).join('')}</div>
+  <label for="dMsg">Extra message (optional)</label><textarea id="dMsg" style="min-height:60px"></textarea>
+  <div class="preview" id="dPrev">${E.html}</div>
+  <button class="btn full" id="dSend" ${isNew?'disabled':''}>Send “${esc(SL(pick).l)}” email${d.email?' to '+esc(d.email):''}</button>
+  ${isNew?'<p class="note">Create the order first, then send emails.</p>':''}
+  <h3 style="font-size:18px;margin-top:22px">History</h3>
+  <ul class="hist">${(d.history||[]).slice().reverse().map(h=>`<li><b>${esc(SL(h.status).l)}</b> · ${when(h.at)}${h.emailed?' · email sent':''}${h.note?' · '+esc(h.note):''}</li>`).join('')||'<li class="note">Nothing yet.</li>'}</ul>`;
+}
+function renderStock(){
+  $('stockRows').innerHTML=P.map(p=>{const v=cfg.stock[p.id];return `<tr><td><b>${p.name}</b>${left(p.id)<=0?' <span class="stock">Sold out</span>':''}</td><td class="n">${money(p.price)}</td><td><input type="number" min="0" data-stock="${p.id}" value="${v===undefined||v===null?'':esc(v)}" placeholder="Unlimited" aria-label="Stock for ${p.name}"></td><td class="n">${cfg.sold[p.id]||0}</td></tr>`}).join('');
+}
+function renderCodes(){
+  const C=cfg.codes||[];
+  $('codeRows').innerHTML=C.length?C.map((c,i)=>`<tr><td><b>${esc(c.code)}</b></td><td class="n">${c.pct}%</td><td class="n">${c.used||0}</td><td><button class="ghost" data-ctog="${i}" style="min-height:36px;padding:4px 12px">${c.active?'On':'Off'}</button></td><td><button class="ghost danger" data-cdel="${i}" style="min-height:36px;padding:4px 12px">Delete</button></td></tr>`).join(''):'<tr><td colspan="5" class="note">No codes yet.</td></tr>';
+}
+function renderEmails(){
+  $('eSign').value=cfg.signoff||'';
+  $('eRows').innerHTML=ST.slice(1).map(s=>`<label for="em-${s.k}">${s.l}</label><textarea id="em-${s.k}" data-tpl="${s.k}" style="min-height:64px" placeholder="${esc(s.m)}">${esc(cfg.templates?.[s.k]||'')}</textarea>`).join('');
+}
+function renderAdmin(){renderStats();renderList();if(sel&&!draft){const o=orders.find(x=>x.num===sel);draft=o?JSON.parse(JSON.stringify(o)):null}}
+function renderCfgViews(){renderStats();if($('codeState'))renderCodeState();if(!$('tp-stock').contains(document.activeElement))renderStock();renderCodes();if(!$('tp-emails').contains(document.activeElement))renderEmails()}
+function showTab(t){tab=t;document.querySelectorAll('.tab').forEach(b=>b.setAttribute('aria-selected',b.dataset.tab===t));document.querySelectorAll('.tpanel').forEach(p=>p.hidden=p.id!=='tp-'+t)}
+
+$('aFilter').innerHTML=[['all','All orders'],['open','Open orders'],...ST.map(s=>[s.k,s.l])].map(o=>`<option value="${o[0]}">${o[1]}</option>`).join('');
+$('aSearch').addEventListener('input',e=>{q=e.target.value.trim().toLowerCase();renderList()});
+$('aFilter').addEventListener('change',e=>{fs=e.target.value;renderList()});
+$('aNew').addEventListener('click',()=>{draft=blank();sel=draft.num;delArm=false;renderList();renderDetail();$('detail').scrollIntoView({block:'start'})});
+$('aExport').addEventListener('click',()=>{
+  const cols=['num','created','status','name','email','phone','addr','ship','items','code','total','carrier','track'];
+  const csv=[cols.join('\t'),...orders.map(o=>cols.map(c=>c==='created'?new Date(o.created).toISOString():String(o[c]??'').replace(/\s+/g,' ')).join('\t'))].join('\n');
+  navigator.clipboard?.writeText(csv).then(()=>amsg('Copied '+orders.length+' orders. Paste into any spreadsheet.','good'),()=>amsg('Copy was blocked by the browser.','err'));
+});
+$('saveStock').addEventListener('click',async()=>{
+  document.querySelectorAll('[data-stock]').forEach(i=>{const v=i.value.trim();if(v==='')delete cfg.stock[i.dataset.stock];else cfg.stock[i.dataset.stock]=Math.max(0,Math.floor(+v))});
+  await saveCfg();renderStock();renderStats();renderGrid();amsg('Stock saved.','good');
+});
+$('codeForm').addEventListener('submit',async e=>{
+  e.preventDefault();const code=$("kCode").value.trim().toUpperCase().replace(/\s+/g,''),pct=Math.round(+$("kPct").value);
+  if(!/^[A-Z0-9_-]{2,20}$/.test(code)){amsg('Use 2 to 20 letters or numbers for the code.','err');return}
+  if(!(pct>=1&&pct<=90)){amsg('Percent off must be between 1 and 90.','err');return}
+  cfg.codes=cfg.codes||[];if(cfg.codes.some(c=>c.code===code)){amsg('That code already exists.','err');return}
+  cfg.codes.push({code,pct,active:true,used:0});await saveCfg();renderCodes();$('kCode').value='';amsg(`Code ${code} added: ${pct}% off.`,'good');
+});
+$('saveEmails').addEventListener('click',async()=>{
+  cfg.signoff=$('eSign').value.trim();cfg.templates={};
+  document.querySelectorAll('[data-tpl]').forEach(t=>{if(t.value.trim())cfg.templates[t.dataset.tpl]=t.value.trim()});
+  await saveCfg();if(draft)renderDetail();amsg('Emails saved.','good');
+});
+document.addEventListener('click',async e=>{
+  const t=e.target.closest('button');if(!t||!document.body.classList.contains('v-admin'))return;
+  if(t.dataset.tab){showTab(t.dataset.tab);amsg('')}
+  else if(t.dataset.ctog){const c=cfg.codes[+t.dataset.ctog];c.active=!c.active;await saveCfg();renderCodes()}
+  else if(t.dataset.cdel){const c=cfg.codes[+t.dataset.cdel];if(t.dataset.arm!=='1'){t.dataset.arm='1';t.textContent='Tap again';return}cfg.codes.splice(+t.dataset.cdel,1);await saveCfg();renderCodes();amsg('Code '+c.code+' deleted.','good')}
+  else if(t.dataset.o){sel=t.dataset.o;const o=orders.find(x=>x.num===sel);draft=o?JSON.parse(JSON.stringify(o)):null;delArm=false;renderList();renderDetail();if(innerWidth<900)$('detail').scrollIntoView({block:'start'})}
+  else if(t.dataset.pick){pick=t.dataset.pick;const m=$('dMsg').value;renderDetail();$('dMsg').value=m;$('dPrev').innerHTML=emailFor({...draft,msg:m},pick).html}
+  else if(t.id==='dCopy'){navigator.clipboard?.writeText(orderText({...draft})).then(()=>amsg('Order details copied.','good'),()=>{})}
+  else if(t.id==='dDel'){if(!delArm){delArm=true;renderDetail();return}const n=draft.num;sel=null;draft=null;delArm=false;await removeOrder(n);renderDetail();renderStock();amsg('Order '+n+' deleted.','good')}
+  else if(t.id==='dSend'){
+    if(sending){amsg('Still sending the last email…');return}if(!/^\S+@\S+\.\S+$/.test(draft.email||'')){amsg('This order needs a valid customer email first.','err');return}
+    sending=true;t.disabled=true;amsg('Sending…');
+    try{const o={...draft,msg:$('dMsg').value.trim()};await sendStatus(o,pick);delete o.msg;draft=o;await saveOrder(o);amsg(`Sent “${SL(pick).l}” to ${o.email}.`,'good');renderDetail();renderStock()}
+    catch(err){amsg(errText(err),'err')}finally{sending=false;const b=$('dSend');if(b)b.disabled=false}
+  }
+});
+document.addEventListener('input',e=>{const f=e.target.dataset?.f;if(f&&draft){draft[f]=e.target.value;if(f!=='notes'&&$('dPrev'))$('dPrev').innerHTML=emailFor({...draft,msg:$('dMsg').value},pick).html}else if(e.target.id==='dMsg'&&draft){$('dPrev').innerHTML=emailFor({...draft,msg:e.target.value},pick).html}});
+document.addEventListener('submit',async e=>{
+  if(e.target.id!=='dForm')return;e.preventDefault();
+  const isNew=!orders.some(o=>o.num===sel);
+  if(!draft.num.trim()||!draft.name.trim()){amsg('Add at least an order number and a name.','err');return}
+  if(isNew&&orders.some(o=>o.num===draft.num.trim())){amsg('That order number is already used.','err');return}
+  draft.num=draft.num.trim();if(isNew)draft.history=[{at:Date.now(),status:'new',note:'created by hand'}];
+  sel=draft.num;await saveOrder(JSON.parse(JSON.stringify(draft)));const o=orders.find(x=>x.num===sel);if(o)draft=JSON.parse(JSON.stringify(o));
+  amsg(isNew?'Order '+draft.num+' created.':'Saved.','good');renderList();renderDetail();renderStock();
+});
+function parseOrder(txt){
+  const g=k=>(txt.match(new RegExp('^\\s*'+k+'\\s*:\\s*(.+)$','im'))||[])[1]?.trim()||'';
+  const o={num:g('Order').toUpperCase(),name:g('Name'),email:g('Email'),phone:g('Phone').replace(/^-$/,''),addr:g('Address').replace(/^-$/,''),ship:g('Delivery'),items:g('Items'),code:g('Discount code').replace(/^-$/,'').toUpperCase(),total:g('Total')};
+  return o.num&&o.name&&o.email?o:null;
+}
+$('aImport').addEventListener('click',async()=>{
+  if(busy){amsg('Still checking the inbox…');return}busy=true;amsg('Checking '+INBOX+'…');
+  try{
+    const r=await call('list_messages',{inboxId:INBOX,limit:50,subject:['New','order']});
+    const list=(r.payload&&r.payload.messages)||[];
+    let added=0,confirmed=0,failed=0;
+    for(const m of list){
+      if(!/^\s*(fwd?:\s*)?new order/i.test(m.subject||''))continue;
+      if(orders.some(o=>o.msgId===m.messageId))continue;
+      const full=await call('get_message',{inboxId:INBOX,messageId:m.messageId});
+      const p=parseOrder(String(full.payload?.extractedText||full.payload?.text||''));
+      if(!p||orders.some(o=>o.num===p.num))continue;
+      const o={...blank(),...p,msgId:m.messageId,created:Date.parse(m.timestamp)||Date.now(),history:[{at:Date.parse(m.timestamp)||Date.now(),status:'new',note:'from inbox'}]};
+      if($('aAuto').checked){try{await sendStatus(o,'confirmed');confirmed++}catch(err){failed++}}
+      await saveOrder(o);added++;
+    }
+    amsg(added?`Added ${added} new order${added>1?'s':''}${confirmed?`, sent ${confirmed} confirmation${confirmed>1?'s':''}`:''}${failed?`, ${failed} email${failed>1?'s':''} failed`:''}.`:'No new orders in the inbox.',failed?'err':'good');
+  }catch(err){amsg(errText(err),'err')}finally{busy=false}
+});
+
+/* ---------- routing + startup ---------- */
+/* ---------- secret admin door ---------- */
+let unlocked=load('st-admin-ok',false),taps=0,tapT=0;
+const hasCode=()=>!!cfg.adminHash;
+function showAdminLink(){$('adminLink').hidden=!(isOwner||unlocked)}
+function openLock(){$('lockErr').textContent='';$('lockCode').value='';$('lockNote').textContent=hasCode()?'Enter your 6-digit code.':(isOwner?'No code set yet. Type a 6-digit code to create it.':'Admin is locked.');$('lockBg').hidden=false;setTimeout(()=>$('lockCode').focus(),50)}
+document.querySelector('.logo').addEventListener('click',e=>{
+  const now=Date.now();taps=now-tapT<700?taps+1:1;tapT=now;
+  if(taps>=5){e.preventDefault();taps=0;if(unlocked||isOwner){location.hash='#admin'}else openLock()}
+});
+$('lockCancel').addEventListener('click',()=>{$('lockBg').hidden=true});
+$('lockForm').addEventListener('submit',async e=>{
+  e.preventDefault();const c=$('lockCode').value.trim();
+  if(!/^\d{6}$/.test(c)){$('lockErr').textContent='Enter exactly 6 digits.';return}
+  const h=await sha('spaceline-admin:'+c);
+  if(!hasCode()){if(!isOwner){$('lockErr').textContent='Admin is locked.';return}cfg.adminHash=h;await saveCfg()}
+  else if(h!==cfg.adminHash){$('lockErr').textContent='Wrong code.';$('lockCode').value='';return}
+  unlocked=true;store('st-admin-ok',true);$('lockBg').hidden=true;showAdminLink();location.hash='#admin';
+});
+$('saveCode').addEventListener('click',async()=>{
+  const c=$('newCode').value.trim();if(!/^\d{6}$/.test(c)){amsg('The code must be exactly 6 digits.','err');return}
+  cfg.adminHash=await sha('spaceline-admin:'+c);await saveCfg();$('newCode').value='';renderCodeState();amsg('Secret admin code saved.','good');
+});
+function renderCodeState(){$('codeState').textContent=hasCode()?'A code is set. Setting a new one replaces it.':'No code set yet.'}
+function route(){
+  const h=location.hash;document.body.classList.toggle('v-admin',h==='#admin');
+  document.body.classList.toggle('v-policies',h.startsWith('#policies'));
+  const ord=h.startsWith('#o-');document.body.classList.toggle('v-order',ord);if(ord){renderOrderView();scrollTo(0,0);return}
+  if(h==='#admin'||h==='#policies')scrollTo(0,0);
+  else if(h.length>1){const el=document.getElementById(h.slice(1));if(el)requestAnimationFrame(()=>el.scrollIntoView())}
+}
+window.addEventListener('hashchange',route);route();
+cfg={...cfg,...load('st-cfg',{})};cfg.stock=cfg.stock||{};cfg.sold=cfg.sold||{};
+orders=load('st-orders',[]);renderAdmin();renderDetail();renderCfgViews();storeNoteSet();all();
+(async()=>{
+  const c=await whenClaude();if(!c)return;
+  try{dbRef=await c.use('db')}catch(e){dbRef=null}
+  try{const u=await c.use('user');isOwner=!!(u&&await u.isOwner())}catch(e){isOwner=false}
+  showAdminLink();
+  if(!dbRef){storeNoteSet();return}
+  dbRef.doc('shop/config').onSnapshot(s=>{
+    if(s.exists){const d=s.data()||{};cfg={stock:{},sold:{},codes:[],templates:{},signoff:'',...JSON.parse(JSON.stringify(d))};cfg.stock=cfg.stock||{};cfg.sold=cfg.sold||{}}
+    if(!s.metadata.fromCache)cfgLive=true;
+    renderGrid();if(view!=='checkout')renderDrawer();renderCfgViews();
+  },()=>{});
+  if(!isOwner)return;
+  const local=orders.slice();
+  dbRef.collection('orders').onSnapshot(s=>{
+    orders=s.docs.map(d=>d.data()).filter(Boolean);
+    if(local.length){const have=new Set(orders.map(o=>o.num));const move=local.filter(o=>!have.has(o.num));local.length=0;(async()=>{for(const o of move){try{await dbRef.doc('orders/'+o.num).set(o)}catch(e){}}})()}
+    renderAdmin();if(sel&&draft&&orders.some(o=>o.num===sel)&&!$('detail').contains(document.activeElement)){draft=JSON.parse(JSON.stringify(orders.find(o=>o.num===sel)));renderDetail()}
+  },()=>{useLocal=true;storeNoteSet()});
+  storeNoteSet();
+})();
+}
+</script>
+</body>
+</html>
