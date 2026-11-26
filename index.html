@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Spaceline Tech</title>
-<meta name="description" content="Phones, audio, tablets, wearables and accessories. New, sealed, 2-year warranty, pay on delivery.">
+<meta name="description" content="Phones, audio, tablets, wearables and accessories. New, sealed, 2-year warranty, Apple Pay or pay on delivery.">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Schibsted+Grotesk:wght@400;500;600;700;800&display=swap" rel="stylesheet">
@@ -158,6 +158,13 @@ body.open{overflow:hidden}
 .okbox{background:var(--stone);border-radius:14px;padding:18px;margin:14px 0}
 .okbox code{font:800 24px/1.2 "Schibsted Grotesk",system-ui,sans-serif;display:block;margin:4px 0}
 .err{color:var(--brick);font-weight:600;margin-top:8px}
+.applepay{background:#000;color:#fff;font-size:18px}
+.applepay:hover{background:#222}
+:root[data-theme="dark"] .applepay{background:#fff;color:#000}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]) .applepay{background:#fff;color:#000}}
+a.full{display:flex}
+.stepsl{padding-left:20px;margin:8px 0}
+.stepsl li{margin:6px 0}
 .back{background:none;border:0;color:var(--soft);font-weight:600;padding:8px 0;min-height:44px}
 .toast{position:fixed;left:50%;bottom:20px;transform:translate(-50%,120%);background:var(--ink);color:var(--bg);padding:12px 18px;border-radius:12px;font-weight:600;z-index:40;transition:transform .25s;max-width:calc(100% - 32px)}
 .toast.show{transform:translate(-50%,0)}
@@ -179,7 +186,7 @@ body.open{overflow:hidden}
       <h1>Phones, audio and more, shipped fast</h1>
       <p>Every device is new, sealed and covered by a 2-year warranty.</p>
     </div>
-    <div class="perks"><span>Free shipping over $99</span><span>30-day returns</span><span>Pay on delivery</span></div>
+    <div class="perks"><span>Free shipping over $99</span><span>30-day returns</span><span>Apple Pay or pay on delivery</span></div>
   </div>
   <div class="lineup" id="lineup"></div>
 </div></header>
@@ -219,7 +226,7 @@ body.open{overflow:hidden}
   <details id="p-shipping"><summary>Shipping</summary><p>Orders ship within 1 business day. Standard delivery takes 3 to 5 business days and costs $7.99, or is free on orders over $99. Express delivery takes 1 to 2 business days and costs $14.99. You get an email with tracking when your order ships.</p></details>
   <details id="p-returns"><summary>Returns and refunds</summary><p>Return any device within 30 days of delivery for a full refund. It must be in like-new condition with its box and accessories. Email us with your order number to start a return. We cover return shipping if the item is faulty or we sent the wrong one.</p></details>
   <details id="p-warranty"><summary>Warranty</summary><p>Every device has a 2-year warranty against defects in materials and workmanship. If it fails in normal use, we repair or replace it at no cost. Accidental and liquid damage beyond the device's water rating are not covered.</p></details>
-  <details id="p-payment"><summary>Payment</summary><p>You pay when your order is delivered, by card or cash. Nothing is charged when you place the order online.</p></details>
+  <details id="p-payment"><summary>Payment</summary><p>Pay online with Apple Pay or card when you place your order, through our secure Stripe checkout. Or choose pay on delivery and pay by card or cash when it arrives.</p></details>
   <details id="p-privacy"><summary>Privacy</summary><p>We use your name, email, phone number and address only to process, deliver and support your order. We don't sell or share your details with anyone except the carrier delivering your order.</p></details>
 </div></section>
 
@@ -242,6 +249,7 @@ body.open{overflow:hidden}
 (() => {
 const SHOP = 'Spaceline Tech', INBOX = 'spacelinetech@agentmail.to';
 const FREE_OVER = 99;
+const PAY_LINK = 'https://buy.stripe.com/00wbIU6r396Ef0o832bEA00';   // Stripe: "Spaceline Tech order", customer enters the order total
 const SHIPPING = [
   {id:'standard', label:'Standard, 3–5 days', price:7.99},
   {id:'express',  label:'Express, 1–2 days',  price:14.99}
@@ -282,6 +290,7 @@ let filter = 'All';
 let step = 'cart';                         // cart | checkout | done
 let lastOrder = null;
 let shipChoice = 'standard';
+let payChoice = 'online';
 
 /* ---------- catalogue ---------- */
 $('#lineup').innerHTML = PRODUCTS.map(p => `<a href="#p-${p.id}" aria-label="${esc(p.name)}">${svg(p.art)}</a>`).join('');
@@ -342,7 +351,7 @@ function totHtml(t) {
   return `<div class="tot">
     <div><span>Subtotal</span><span>${money(t.sub)}</span></div>
     <div><span>Shipping (${t.opt.id})</span><span>${t.ship ? money(t.ship) : 'Free'}</span></div>
-    <div class="big"><span>Total, pay on delivery</span><span>${money(t.total)}</span></div></div>`;
+    <div class="big"><span>Total</span><span>${money(t.total)}</span></div></div>`;
 }
 function shipHtml(t) {
   return `<div class="ship" role="radiogroup" aria-label="Shipping">${SHIPPING.map(s => {
@@ -353,6 +362,22 @@ function shipHtml(t) {
 
 function renderDrawer() {
   const body = $('#dbody'), title = $('#dTitle');
+  if (step === 'done' && lastOrder && lastOrder.pay === 'online') {
+    const o = lastOrder;
+    title.textContent = 'Pay for your order';
+    body.innerHTML = `<div class="okbox"><span>Order ${o.num}</span><code>${money(o.total)}</code>
+      <span>Enter this exact amount on the payment page.</span></div>
+      <ol class="stepsl">
+        <li><b>Pay.</b> Tap the button, enter <b>${o.total.toFixed(2)}</b> as the amount and pay with Apple Pay or card.</li>
+        <li><b>Send your order.</b> Then tap "Email my order" so we know what to ship.</li>
+      </ol>
+      <a class="btn applepay full" id="payBtn" href="${payUrl(o)}" target="_blank" rel="noopener">Pay with Apple Pay</a>
+      <button class="ghost full" id="copyAmt">Copy amount ${money(o.total)}</button>
+      <a class="ghost full" href="${mailtoFor(o)}">Email my order</a>
+      <p class="note">Apple Pay appears on Safari and iPhone; other browsers show card, Google Pay or Link. Your order number is attached to the payment.</p>
+      <button class="back" id="doneBtn">Continue shopping</button>`;
+    return;
+  }
   if (step === 'done' && lastOrder) {
     title.textContent = 'Order placed';
     body.innerHTML = `<div class="okbox"><span>Your order number</span><code>${lastOrder.num}</code>
@@ -385,10 +410,15 @@ function renderDrawer() {
         </div>
         <label for="cNote">Delivery note (optional)</label><textarea id="cNote" placeholder="Gate code, leave with neighbour…"></textarea>
         <label>Shipping</label>${shipHtml(t)}
+        <label>Payment</label>
+        <div class="ship" role="radiogroup" aria-label="Payment">
+          <label><input type="radio" name="pay" value="online" ${payChoice === 'online' ? 'checked' : ''}>Apple Pay or card, pay now</label>
+          <label><input type="radio" name="pay" value="delivery" ${payChoice === 'delivery' ? 'checked' : ''}>Pay on delivery, card or cash</label>
+        </div>
         ${totHtml(t)}
         <p class="err" id="coErr" role="alert"></p>
-        <button class="btn full">Place order, ${money(t.total)}</button>
-        <p class="note">Nothing is charged now. You pay by card or cash when it arrives.</p>
+        <button class="btn full">${payChoice === 'online' ? 'Continue to payment' : 'Place order'}, ${money(t.total)}</button>
+        <p class="note">${payChoice === 'online' ? 'Next you pay securely with Apple Pay or card on Stripe.' : 'Nothing is charged now. You pay by card or cash when it arrives.'}</p>
       </form>`;
     const draft = load('sl-customer', {});
     for (const k of ['cName','cEmail','cPhone','cAddr','cCity','cZip']) if (draft[k]) $('#' + k).value = draft[k];
@@ -409,12 +439,13 @@ $('#dbody').addEventListener('click', e => {
   const q = e.target.closest('[data-q]');
   if (q) return add(q.dataset.q, +q.dataset.n);
   if (e.target.closest('#toCheckout')) { step = 'checkout'; renderDrawer(); $('#cName').focus(); return; }
+  if (e.target.closest('#copyAmt')) { navigator.clipboard?.writeText(lastOrder.total.toFixed(2)).then(() => toast('Amount copied'), () => toast(lastOrder.total.toFixed(2))); return; }
   if (e.target.closest('#backBtn')) { step = 'cart'; renderDrawer(); return; }
   if (e.target.closest('#browse') || e.target.closest('#doneBtn')) { step = 'cart'; closeCart(); location.hash = 'shop'; }
 });
 $('#dbody').addEventListener('change', e => {
-  if (e.target.name !== 'ship') return;
-  shipChoice = e.target.value;
+  if (e.target.name !== 'ship' && e.target.name !== 'pay') return;
+  if (e.target.name === 'ship') shipChoice = e.target.value; else payChoice = e.target.value;
   if (step === 'checkout') {               // keep typed details
     const form = $('#coForm'); const vals = {};
     form.querySelectorAll('input[id],textarea').forEach(i => vals[i.id] = i.value);
@@ -437,20 +468,25 @@ $('#dbody').addEventListener('submit', e => {
     name: f('cName'), email: f('cEmail').toLowerCase(), phone: f('cPhone'),
     addr: `${f('cAddr')}, ${f('cCity')} ${f('cZip')}`, note: f('cNote'),
     items: Object.entries(cart).map(([id, q]) => ({ id, name: byId(id).name, q, price: byId(id).price })),
-    shipping: t.opt.label, ship: t.ship, sub: t.sub, total: t.total
+    shipping: t.opt.label, ship: t.ship, sub: t.sub, total: t.total,
+    pay: payChoice
   };
   orders.push(order); save('sl-orders', orders);
   cart = {}; save('sl-cart', cart); updateCount();
   lastOrder = order; step = 'done'; renderDrawer();
-  location.href = mailtoFor(order);
+  if (order.pay === 'delivery') location.href = mailtoFor(order);
 });
 
+function payUrl(o) {
+  return `${PAY_LINK}?client_reference_id=${encodeURIComponent(o.num)}&prefilled_email=${encodeURIComponent(o.email)}`;
+}
 function mailtoFor(o) {
   const lines = [
     `New order ${o.num}`, '',
     ...o.items.map(i => `${i.q} × ${i.name}  ${money(i.price * i.q)}`),
     `Shipping: ${o.shipping}  ${o.ship ? money(o.ship) : 'Free'}`,
-    `Total (pay on delivery): ${money(o.total)}`, '',
+    `Total: ${money(o.total)}`,
+    `Payment: ${o.pay === 'online' ? 'Apple Pay or card online (Stripe, reference ' + o.num + ')' : 'on delivery'}`, '',
     `Name: ${o.name}`, `Email: ${o.email}`, `Phone: ${o.phone}`, `Address: ${o.addr}`,
     ...(o.note ? [`Note: ${o.note}`] : [])
   ];
@@ -485,7 +521,7 @@ $('#trackForm').addEventListener('submit', e => {
   if (o) {
     const d = new Date(o.date).toLocaleDateString(undefined, { month: 'long', day: 'numeric' });
     out.innerHTML = `<div class="res"><h3>Order ${o.num}</h3>
-      <p class="note">Placed ${d} · ${o.items.reduce((a, i) => a + i.q, 0)} item(s) · ${money(o.total)} on delivery</p>
+      <p class="note">Placed ${d} · ${o.items.reduce((a, i) => a + i.q, 0)} item(s) · ${money(o.total)} ${o.pay === 'online' ? 'paid online' : 'on delivery'}</p>
       <div class="steps">${STAGES.map((s, i) => `<div class="${i === 0 ? 'on' : ''}">${s}</div>`).join('')}</div>
       <p class="note">We'll email ${esc(o.email)} as your order is confirmed, shipped and delivered. For the latest status, <a href="mailto:${INBOX}?subject=${encodeURIComponent('Status of order ' + o.num)}">email us</a>.</p></div>`;
   } else {
